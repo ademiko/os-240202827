@@ -1,0 +1,57 @@
+Microsoft Windows [Version 10.0.26100.3915]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\MSI MODERN14>cd
+C:\Users\MSI MODERN14
+
+C:\Users\MSI MODERN14>cd
+C:\Users\MSI MODERN14
+
+C:\Users\MSI MODERN14>cd Downloads
+
+C:\Users\MSI MODERN14\Downloads>cd os-202402827-main
+
+C:\Users\MSI MODERN14\Downloads\os-202402827-main>cd os-202402827-main
+
+C:\Users\MSI MODERN14\Downloads\os-202402827-main\os-202402827-main>docker build -t praktikum-os .
+[+] Building 71.1s (7/7) FINISHED                                                                               docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                            0.0s
+ => => transferring dockerfile: 264B                                                                                            0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:22.04                                                                 3.6s
+ => [auth] library/ubuntu:pull token for registry-1.docker.io                                                                   0.0s
+ => [internal] load .dockerignore                                                                                               0.0s
+ => => transferring context: 2B                                                                                                 0.0s
+ => CACHED [1/2] FROM docker.io/library/ubuntu:22.04@sha256:67cadaff1dca187079fce41360d5a7eb6f7dcd3745e53c79ad5efd8563118240    0.0s
+ => [2/2] RUN apt-get update && apt-get install -y bash nano curl wget iputils-ping procps net-tools                           67.1s
+ => exporting to image                                                                                                          0.3s
+ => => exporting layers                                                                                                         0.2s
+ => => writing image sha256:db693d931eee1c7f5457aba27d2ac7f97e4d171a5012e575f6bd268e43f887a4                                    0.0s
+ => => naming to docker.io/library/praktikum-os                                                                                 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/g9o8zkypqn5xo3nbk2e3q0nat
+
+C:\Users\MSI MODERN14\Downloads\os-202402827-main\os-202402827-main>docker run -it --name praktikum-os praktikum-os
+root@22d85e2b4196:/# ls -l
+total 56
+lrwxrwxrwx   1 root root    7 Apr 15 14:03 bin -> usr/bin
+drwxr-xr-x   2 root root 4096 Apr 18  2022 boot
+drwxr-xr-x   5 root root  360 May 10 03:34 dev
+drwxr-xr-x   1 root root 4096 May 10 03:34 etc
+drwxr-xr-x   2 root root 4096 Apr 18  2022 home
+lrwxrwxrwx   1 root root    7 Apr 15 14:03 lib -> usr/lib
+lrwxrwxrwx   1 root root    9 Apr 15 14:03 lib32 -> usr/lib32
+lrwxrwxrwx   1 root root    9 Apr 15 14:03 lib64 -> usr/lib64
+lrwxrwxrwx   1 root root   10 Apr 15 14:03 libx32 -> usr/libx32
+drwxr-xr-x   2 root root 4096 Apr 15 14:03 media
+drwxr-xr-x   2 root root 4096 Apr 15 14:03 mnt
+drwxr-xr-x   2 root root 4096 Apr 15 14:03 opt
+dr-xr-xr-x 253 root root    0 May 10 03:34 proc
+drwx------   2 root root 4096 Apr 15 14:10 root
+drwxr-xr-x   5 root root 4096 Apr 15 14:10 run
+lrwxrwxrwx   1 root root    8 Apr 15 14:03 sbin -> usr/sbin
+drwxr-xr-x   2 root root 4096 Apr 15 14:03 srv
+dr-xr-xr-x  11 root root    0 May 10 03:34 sys
+drwxrwxrwt   1 root root 4096 May 10 03:30 tmp
+drwxr-xr-x   1 root root 4096 Apr 15 14:03 usr
+drwxr-xr-x   1 root root 4096 Apr 15 14:10 var
+root@22d85e2b4196:/#
