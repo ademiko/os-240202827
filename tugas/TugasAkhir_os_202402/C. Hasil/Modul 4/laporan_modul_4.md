@@ -2,64 +2,47 @@
 
 **Mata Kuliah**: Sistem Operasi
 **Semester**: Genap / Tahun Ajaran 2024–2025
-**Nama**: `<Nama Lengkap>`
-**NIM**: `<Nomor Induk Mahasiswa>`
+**Nama**: Ade Miko 
+**NIM**: 240202827
 **Modul yang Dikerjakan**:
-`(Contoh: Modul 1 – System Call dan Instrumentasi Kernel)`
+`(Modul 4 – Subsistem Kernel Alternatif)`
 
 ---
 
 ## 📌 Deskripsi Singkat Tugas
 
-Tuliskan deskripsi singkat dari modul yang Anda kerjakan. Misalnya:
+Modul 4 – Subsistem Kernel Alternatif
+Modul ini terdiri dari dua bagian:
 
-* **Modul 1 – System Call dan Instrumentasi Kernel**:
-  Menambahkan dua system call baru, yaitu `getpinfo()` untuk melihat proses yang aktif dan `getReadCount()` untuk menghitung jumlah pemanggilan `read()` sejak boot.
----
+**System Call chmod(path, mode)**: Menambahkan kemampuan untuk mengubah mode file (read-only atau read-write) pada sistem file xv6.
+**Driver /dev/random**: Menambahkan pseudo-device baru untuk menghasilkan data acak, yang dapat dibaca oleh proses pengguna melalui device file /dev/random.
 
 ## 🛠️ Rincian Implementasi
 
-Tuliskan secara ringkas namun jelas apa yang Anda lakukan:
+**A. System Call chmod(path, mode)**
+8* Menambahkan field mode ke struktur inode di fs.h untuk menyimpan status read-only.
+* Implementasi syscall chmod() di sysfile.c.
+* Mendaftarkan syscall baru di syscall.c, syscall.h, user.h, dan usys.S.
+* Menambahkan validasi mode file di fungsi filewrite() pada file.c.
+* Menambahkan program uji chmodtest.c untuk memastikan file read-only tidak bisa ditulis kembali.
 
-### Contoh untuk Modul 1:
-
-* Menambahkan dua system call baru di file `sysproc.c` dan `syscall.c`
-* Mengedit `user.h`, `usys.S`, dan `syscall.h` untuk mendaftarkan syscall
-* Menambahkan struktur `struct pinfo` di `proc.h`
-* Menambahkan counter `readcount` di kernel
-* Membuat dua program uji: `ptest.c` dan `rtest.c`
----
+**B. Pseudo-Device /dev/random**
+* Membuat file baru random.c yang berisi fungsi randomread() sebagai generator byte acak.
+* Mendaftarkan fungsi randomread() ke array devsw[] di file.c pada indeks 3.
+* Membuat device file /dev/random menggunakan mknod() di file init.c.
+* Membuat program uji randomtest.c untuk membaca dan menampilkan byte acak dari /dev/random.
 
 ## ✅ Uji Fungsionalitas
 
-Tuliskan program uji apa saja yang Anda gunakan, misalnya:
+Program uji yang digunakan:
+* chmodtest: Menguji apakah file dengan mode read-only memblokir operasi tulis.
+* randomtest: Menguji apakah /dev/random dapat menghasilkan byte acak.
 
-* `ptest`: untuk menguji `getpinfo()`
-* `rtest`: untuk menguji `getReadCount()`
-* `cowtest`: untuk menguji fork dengan Copy-on-Write
-* `shmtest`: untuk menguji `shmget()` dan `shmrelease()`
-* `chmodtest`: untuk memastikan file `read-only` tidak bisa ditulis
-* `audit`: untuk melihat isi log system call (jika dijalankan oleh PID 1)
 
----
 
 ## 📷 Hasil Uji
 
 Lampirkan hasil uji berupa screenshot atau output terminal. Contoh:
-
-### 📍 Contoh Output `cowtest`:
-
-```
-Child sees: Y
-Parent sees: X
-```
-
-### 📍 Contoh Output `shmtest`:
-
-```
-Child reads: A
-Parent reads: B
-```
 
 ### 📍 Contoh Output `chmodtest`:
 
@@ -67,21 +50,17 @@ Parent reads: B
 Write blocked as expected
 ```
 
-Jika ada screenshot:
+### 📍 Contoh Output `randomtest`:
 
 ```
-![hasil cowtest](./screenshots/cowtest_output.png)
+166 231 148 61 50 131 0 57
 ```
-
----
 
 ## ⚠️ Kendala yang Dihadapi
 
-Tuliskan kendala (jika ada), misalnya:
-
-* Salah implementasi `page fault` menyebabkan panic
-* Salah memetakan alamat shared memory ke USERTOP
-* Proses biasa bisa akses audit log (belum ada validasi PID)
+* Field mode tidak bisa disimpan permanen karena tidak dimasukkan ke dalam layout disk inode — bersifat volatile.
+* Lupa mendaftarkan device /dev/random dengan mknod() menyebabkan open("/dev/random") gagal.
+* Validasi di filewrite() awalnya tidak mengecek pointer f->ip, menyebabkan kernel panic pada file tanpa inode.
 
 ---
 
