@@ -69,18 +69,9 @@ PID	MEM	NAME
 ### 📍 Contoh Output `rtest`:
 
 ```
-Child reads: A
-Parent reads: B
-```
-
-### 📍 Contoh Output `chmodtest`:
-
-```
 read count sebelum: 12
 masukan sesuatau (maksimal 5 karakter): 
 ```
-
-
 ---
 
 ## ⚠️ Kendala yang Dihadapi
