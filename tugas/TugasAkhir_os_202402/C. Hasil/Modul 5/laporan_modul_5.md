@@ -2,20 +2,17 @@
 
 **Mata Kuliah**: Sistem Operasi
 **Semester**: Genap / Tahun Ajaran 2024–2025
-**Nama**: `<Nama Lengkap>`
-**NIM**: `<Nomor Induk Mahasiswa>`
+**Nama**: Ade Miko
+**NIM**: 240202827
 **Modul yang Dikerjakan**:
-`(Contoh: Modul 1 – System Call dan Instrumentasi Kernel)`
+`(Modul 5 – Audit dan Keamanan Sistem)`
 
 ---
 
 ## 📌 Deskripsi Singkat Tugas
 
-Tuliskan deskripsi singkat dari modul yang Anda kerjakan. Misalnya:
-
-* **Modul 1 – System Call dan Instrumentasi Kernel**:
-  Menambahkan dua system call baru, yaitu `getpinfo()` untuk melihat proses yang aktif dan `getReadCount()` untuk menghitung jumlah pemanggilan `read()` sejak boot.
----
+**Modul 5 – Audit dan Keamanan Sistem**
+Tugas ini bertujuan untuk menambahkan kemampuan sistem untuk merekam semua system call yang dijalankan oleh proses dalam bentuk audit log, serta membatasi akses log hanya untuk proses khusus (PID 1). Modul ini juga melatih pemahaman terhadap integrasi fitur keamanan pada level kernel.
 
 ## 🛠️ Rincian Implementasi
 
@@ -23,65 +20,47 @@ Tuliskan secara ringkas namun jelas apa yang Anda lakukan:
 
 ### Contoh untuk Modul 1:
 
-* Menambahkan dua system call baru di file `sysproc.c` dan `syscall.c`
-* Mengedit `user.h`, `usys.S`, dan `syscall.h` untuk mendaftarkan syscall
-* Menambahkan struktur `struct pinfo` di `proc.h`
-* Menambahkan counter `readcount` di kernel
-* Membuat dua program uji: `ptest.c` dan `rtest.c`
+**A. Audit System Call**
+* Menambahkan struktur audit_entry dan array audit_log[] di syscall.c untuk mencatat setiap system call.
+* Mencatat system call yang valid di dalam fungsi syscall() berdasarkan pid, nomor syscall, dan waktu (tick).
+* Implementasi syscall baru get_audit_log(void *buf, int max) di sysproc.c, hanya dapat diakses oleh proses dengan PID 1.
+* Menambahkan deklarasi syscall di user.h, usys.S, syscall.h, dan mendaftarkannya di syscall.c.
+
+**B. Program Uji dan Validasi Akses**
+* Membuat program audit.c untuk mengambil log melalui get_audit_log() dan mencetak ke layar.
+* Menambahkan audit ke dalam Makefile agar dapat dibangun secara otomatis.
+* Untuk menjalankan audit sebagai proses PID 1, mengedit file init.c dan mengganti default shell dengan exec("audit", argv).
 ---
 
 ## ✅ Uji Fungsionalitas
 
-Tuliskan program uji apa saja yang Anda gunakan, misalnya:
+Program uji yang digunakan:
 
-* `ptest`: untuk menguji `getpinfo()`
-* `rtest`: untuk menguji `getReadCount()`
-* `cowtest`: untuk menguji fork dengan Copy-on-Write
-* `shmtest`: untuk menguji `shmget()` dan `shmrelease()`
-* `chmodtest`: untuk memastikan file `read-only` tidak bisa ditulis
-* `audit`: untuk melihat isi log system call (jika dijalankan oleh PID 1)
-
+audit: Menjalankan syscall get_audit_log() dan mencetak isi log.
 ---
 
 ## 📷 Hasil Uji
 
-Lampirkan hasil uji berupa screenshot atau output terminal. Contoh:
-
-### 📍 Contoh Output `cowtest`:
-
+### 📍 Output jika dijalankan oleh proses biasa:
 ```
-Child sees: Y
-Parent sees: X
+Access denied or error.
 ```
-
-### 📍 Contoh Output `shmtest`:
-
+### 📍 Output jika dijalankan oleh PID 1:
 ```
-Child reads: A
-Parent reads: B
+=== Audit Log ===
+[0] PID=1 SYSCALL=5 TICK=12
+[1] PID=1 SYSCALL=6 TICK=13
+[2] PID=1 SYSCALL=22 TICK=14
+...
 ```
-
-### 📍 Contoh Output `chmodtest`:
-
-```
-Write blocked as expected
-```
-
-Jika ada screenshot:
-
-```
-![hasil cowtest](./screenshots/cowtest_output.png)
-```
-
----
-
 ## ⚠️ Kendala yang Dihadapi
 
 Tuliskan kendala (jika ada), misalnya:
 
-* Salah implementasi `page fault` menyebabkan panic
-* Salah memetakan alamat shared memory ke USERTOP
-* Proses biasa bisa akses audit log (belum ada validasi PID)
+* lupa memvalidasi bahwa hanya PID 1 yang boleh mengakses get_audit_log(), menyebabkan proses lain bisa membaca log.
+* Alokasi buffer untuk argptr() perlu disesuaikan ukurannya dengan jumlah entri maksimum (MAX_AUDIT).
+* Karena xv6 tidak mendukung file log permanen, semua data hanya tersimpan di memori dan hilang setelah reboot.
+* Debugging PID 1 memerlukan mengganti default exec("sh", ...) di init.c, dan terkadang gagal karena program audit belum dibuat saat make.
 
 ---
 
