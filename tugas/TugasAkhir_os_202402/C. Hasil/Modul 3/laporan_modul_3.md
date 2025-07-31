@@ -2,50 +2,42 @@
 
 **Mata Kuliah**: Sistem Operasi
 **Semester**: Genap / Tahun Ajaran 2024–2025
-**Nama**: `<Nama Lengkap>`
-**NIM**: `<Nomor Induk Mahasiswa>`
+**Nama**: Ade Miko
+**NIM**: 240202827
 **Modul yang Dikerjakan**:
-`(Contoh: Modul 1 – System Call dan Instrumentasi Kernel)`
+`(Modul 3 – Manajemen Memori Tingkat Lanjut)`
 
 ---
 
 ## 📌 Deskripsi Singkat Tugas
 
-Tuliskan deskripsi singkat dari modul yang Anda kerjakan. Misalnya:
-
-* **Modul 1 – System Call dan Instrumentasi Kernel**:
-  Menambahkan dua system call baru, yaitu `getpinfo()` untuk melihat proses yang aktif dan `getReadCount()` untuk menghitung jumlah pemanggilan `read()` sejak boot.
----
+**Modul 3 – Manajemen Memori Tingkat Lanjut**
+Tugas ini mencakup dua bagian utama dalam pengelolaan memori lanjutan di xv6:
+*Implementasi Copy-on-Write Fork (CoW): Mekanisme fork() yang lebih efisien dengan membagikan halaman memori secara read-only dan hanya menyalin saat terjadi penulisan (write).
+*Implementasi Shared Memory ala System V: Menyediakan dua system call baru (shmget dan shmrelease) agar antar proses dapat berbagi satu halaman memori dengan reference count.
 
 ## 🛠️ Rincian Implementasi
 
-Tuliskan secara ringkas namun jelas apa yang Anda lakukan:
-
-### Contoh untuk Modul 1:
-
-* Menambahkan dua system call baru di file `sysproc.c` dan `syscall.c`
-* Mengedit `user.h`, `usys.S`, dan `syscall.h` untuk mendaftarkan syscall
-* Menambahkan struktur `struct pinfo` di `proc.h`
-* Menambahkan counter `readcount` di kernel
-* Membuat dua program uji: `ptest.c` dan `rtest.c`
+**A. Copy-on-Write Fork (CoW)**
+*Menambahkan array ref_count[] di vm.c untuk tracking penggunaan halaman fisik.
+*Menambahkan fungsi incref() dan decref() untuk manajemen reference count.
+*Menambahkan flag PTE_COW di mmu.h.
+*Mengganti copyuvm() menjadi cowuvm() di vm.c dan digunakan pada fork() di proc.c.
+*Menangani page fault CoW di trap.c saat proses menulis ke halaman COW.
+**B. Shared Memory ala System V**
+*Menambahkan struktur shmtab[] di vm.c untuk menyimpan informasi shared memory (key, frame, refcount).
+*Menambahkan system call shmget() dan shmrelease() di sysproc.c.
+*Mendaftarkan syscall baru di syscall.c, syscall.h, usys.S, dan user.h.
 ---
-
 ## ✅ Uji Fungsionalitas
 
-Tuliskan program uji apa saja yang Anda gunakan, misalnya:
-
-* `ptest`: untuk menguji `getpinfo()`
-* `rtest`: untuk menguji `getReadCount()`
-* `cowtest`: untuk menguji fork dengan Copy-on-Write
-* `shmtest`: untuk menguji `shmget()` dan `shmrelease()`
-* `chmodtest`: untuk memastikan file `read-only` tidak bisa ditulis
-* `audit`: untuk melihat isi log system call (jika dijalankan oleh PID 1)
-
+Program uji yang digunakan:
+*cowtest: Menguji apakah fork() menggunakan mekanisme Copy-on-Write.
+*shmtest: Menguji pembagian memori antar proses menggunakan shmget() dan shmrelease().
 ---
 
 ## 📷 Hasil Uji
 
-Lampirkan hasil uji berupa screenshot atau output terminal. Contoh:
 
 ### 📍 Contoh Output `cowtest`:
 
@@ -60,38 +52,21 @@ Parent sees: X
 Child reads: A
 Parent reads: B
 ```
-
-### 📍 Contoh Output `chmodtest`:
-
-```
-Write blocked as expected
-```
-
-Jika ada screenshot:
-
-```
-![hasil cowtest](./screenshots/cowtest_output.png)
-```
-
 ---
 
 ## ⚠️ Kendala yang Dihadapi
 
-Tuliskan kendala (jika ada), misalnya:
-
-* Salah implementasi `page fault` menyebabkan panic
-* Salah memetakan alamat shared memory ke USERTOP
-* Proses biasa bisa akses audit log (belum ada validasi PID)
-
+*Penanganan page fault untuk halaman yang bukan COW sempat menyebabkan kernel panic akibat validasi pte yang tidak tepat.
+*Lupa menghapus flag PTE_COW saat menyalin halaman baru menyebabkan akses ilegal di proses child.
+*Masalah mapping di shmget() karena alamat yang digunakan tidak konsisten menyebabkan crash.
+*ref_count tidak decrement dengan benar saat proses selesai atau memanggil shmrelease().
 ---
 
 ## 📚 Referensi
 
-Tuliskan sumber referensi yang Anda gunakan, misalnya:
+Buku xv6 MIT: https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf
 
-* Buku xv6 MIT: [https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf)
-* Repositori xv6-public: [https://github.com/mit-pdos/xv6-public](https://github.com/mit-pdos/xv6-public)
-* Stack Overflow, GitHub Issues, diskusi praktikum
+Repositori xv6-public: https://github.com/mit-pdos/xv6-public
 
 ---
 
